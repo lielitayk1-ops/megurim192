@@ -66,8 +66,46 @@
 
   <br><br>
 
-  <button>כניסה</button>
+  <button onclick="login()">כניסה</button>
 
 </body>
+
+<script>
+
+  var scriptURL = "הקישור_שלך";
+
+  function login() {
+    var name = document.getElementById("שם").value;
+    var phone = document.getElementById("טלפון").value;
+
+    if (name === "" || phone === "") {
+      alert("נא למלא שם וטלפון!");
+      return;
+    }
+
+    var data = {
+      שם: name,
+      טלפון: phone,
+      קורס: "",
+      חיילים: "",
+      כניסה: "",
+      יציאה: "",
+      חדרים: "",
+      הערות: ""
+    };
+
+    fetch(scriptURL, {
+      method: "POST",
+      body: JSON.stringify(data)
+    })
+    .then(function() {
+      alert("ברוך הבא, " + name + "!");
+    })
+    .catch(function() {
+      alert("שגיאה בחיבור לגוגל");
+    });
+  }
+
+</script>
 
 </html>
