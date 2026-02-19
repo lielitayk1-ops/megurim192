@@ -38,23 +38,54 @@
       display: block;
       margin-top: 10px;
     }
+    .בחירה-כפתורים {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      margin-top: 20px;
+    }
+    .בחירה-כפתורים button {
+      padding: 16px 24px;
+      font-size: 14px;
+    }
   </style>
 </head>
 <body>
   <h1>🏠 ניהול מגורים</h1>
   <p>הילטון 192</p>
 
-  <!-- מסך כניסה -->
-  <div id="מסך-כניסה">
+  <!-- מסך בחירה -->
+  <div id="מסך-בחירה">
+    <h2>מי אתה?</h2>
+    <div class="בחירה-כפתורים">
+      <button onclick="בחר('מפקד')">👨‍✈️ מפקד קורס</button>
+      <button onclick="בחר('אחראי')">🔑 אחראי מגורים</button>
+    </div>
+  </div>
+
+  <!-- מסך כניסה מפקד -->
+  <div id="מסך-כניסה" style="display:none">
     <h2>מפקד קורס – כניסה</h2>
     <label>שם מלא:</label>
     <input type="text" id="שם" placeholder="הכנס שם מלא">
     <label>מספר טלפון:</label>
     <input type="tel" id="טלפון" placeholder="050-0000000">
     <button onclick="login()">כניסה</button>
+    <br>
+    <button onclick="חזור()" style="background:none;color:white;font-size:13px;padding:8px;">← חזור</button>
   </div>
 
-  <!-- מסך בקשה - מוסתר בהתחלה -->
+  <!-- מסך כניסה אחראי -->
+  <div id="מסך-אחראי" style="display:none">
+    <h2>אחראי מגורים – כניסה</h2>
+    <label>סיסמה:</label>
+    <input type="password" id="סיסמה" placeholder="הכנס סיסמה">
+    <button onclick="loginAdmin()">כניסה</button>
+    <br>
+    <button onclick="חזור()" style="background:none;color:white;font-size:13px;padding:8px;">← חזור</button>
+  </div>
+
+  <!-- מסך בקשה מפקד -->
   <div id="מסך-בקשה" style="display:none">
     <h2 id="כותרת-בקשה"></h2>
     <label>מספר קורס:</label>
@@ -70,10 +101,31 @@
     <button onclick="submitRequest()">📤 הגש בקשה</button>
   </div>
 
+  <!-- מסך אחראי מגורים -->
+  <div id="מסך-ניהול" style="display:none">
+    <h2>ברוך הבא, אחראי מגורים 👋</h2>
+    <p>כאן תוכל לנהל את הבקשות</p>
+  </div>
+
   <script>
     var scriptURL = "https://script.google.com/macros/s/AKfycbzZk2ELj_oAkd_1Vgvj3lDB7DFe0_B3USa_WfcjApabmuUuCFyMjt97PA1nxTfn6MHqVQ/exec";
     var userName = "";
     var userPhone = "";
+
+    function בחר(סוג) {
+      document.getElementById("מסך-בחירה").style.display = "none";
+      if (סוג === "מפקד") {
+        document.getElementById("מסך-כניסה").style.display = "block";
+      } else {
+        document.getElementById("מסך-אחראי").style.display = "block";
+      }
+    }
+
+    function חזור() {
+      document.getElementById("מסך-כניסה").style.display = "none";
+      document.getElementById("מסך-אחראי").style.display = "none";
+      document.getElementById("מסך-בחירה").style.display = "block";
+    }
 
     function login() {
       var name = document.getElementById("שם").value;
@@ -89,18 +141,26 @@
       document.getElementById("כותרת-בקשה").textContent = "שלום " + name + ", מלא פרטי הבקשה:";
     }
 
+    function loginAdmin() {
+      var pass = document.getElementById("סיסמה").value;
+      if (pass !== "Hilton192!") {
+        alert("סיסמה שגויה!");
+        return;
+      }
+      document.getElementById("מסך-אחראי").style.display = "none";
+      document.getElementById("מסך-ניהול").style.display = "block";
+    }
+
     function submitRequest() {
       var course = document.getElementById("קורס").value;
       var soldiers = document.getElementById("חיילים").value;
       var dateIn = document.getElementById("כניסה").value;
       var dateOut = document.getElementById("יציאה").value;
       var notes = document.getElementById("הערות").value;
-
       if (course === "" || soldiers === "" || dateIn === "" || dateOut === "") {
         alert("נא למלא את כל השדות!");
         return;
       }
-
       var data = {
         שם: userName,
         טלפון: userPhone,
@@ -111,7 +171,6 @@
         חדרים: "",
         הערות: notes
       };
-
       fetch(scriptURL, {
         method: "POST",
         mode: "no-cors",
