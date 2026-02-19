@@ -116,6 +116,13 @@
     <input type="text" id="קורס" placeholder="לדוגמה: 2024/3">
     <label>מספר חיילים:</label>
     <input type="number" id="חיילים" placeholder="כמה חיילים?">
+
+    <!-- אזור בחירת חדרים -->
+    <div id="אזור-חדרים" style="display:none">
+      <p id="הסבר-חדרים" style="font-size:13px;color:#ccc;margin-top:10px;"></p>
+      <div id="כפתורי-חדרים" style="display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin-top:8px;"></div>
+    </div>
+
     <label>תאריך כניסה לחדר:</label>
     <input type="date" id="כניסה">
     <label>תאריך יציאה מחדר:</label>
@@ -170,6 +177,7 @@
     var scriptURL = "https://script.google.com/macros/s/AKfycbwHeGlUgt58c8b5sbZ3mnguao7SzWQTm2sx3SqQZs_QArsOphfMrUowDkBxPE_itygshg/exec";
     var userName = "";
     var userPhone = "";
+    var חדריםנבחרים = [];
 
     function הצג(מסך) {
       var מסכים = ["מסך-בחירה","מסך-כניסה","מסך-אחראי","מסך-תפריט-מפקד","מסך-בקשה","מסך-תקלה","מסך-ניהול"];
@@ -210,6 +218,48 @@
       הצג("מסך-ניהול");
     }
 
+    // בחירת חדרים לפי מספר חיילים
+    document.getElementById("חיילים").addEventListener("input", function() {
+      var חיילים = parseInt(this.value) || 0;
+      var נדרש = Math.ceil(חיילים / 8);
+      var אזור = document.getElementById("אזור-חדרים");
+      var הסבר = document.getElementById("הסבר-חדרים");
+      var כפתורים = document.getElementById("כפתורי-חדרים");
+
+      if (חיילים > 0) {
+        אזור.style.display = "block";
+        הסבר.textContent = חיילים + " חיילים = " + נדרש + " חדרים. בחר " + נדרש + " חדרים:";
+        חדריםנבחרים = [];
+        כפתורים.innerHTML = "";
+
+        var חדריםלא = [51, 54];
+        for (var i = 41; i <= 60; i++) {
+          if (חדריםלא.includes(i)) continue;
+          var btn = document.createElement("button");
+          btn.textContent = i;
+          btn.style.cssText = "padding:10px 14px;border-radius:8px;border:none;background:#333;color:white;cursor:pointer;font-size:14px;font-weight:bold;margin:0;";
+          btn.onclick = (function(b, num, n) {
+            return function() {
+              if (b.style.background === "rgb(88, 166, 255)") {
+                b.style.background = "#333";
+                חדריםנבחרים = חדריםנבחרים.filter(function(x) { return x !== num; });
+              } else {
+                if (חדריםנבחרים.length >= n) {
+                  alert("אפשר לבחור רק " + n + " חדרים!");
+                  return;
+                }
+                b.style.background = "#58a6ff";
+                חדריםנבחרים.push(num);
+              }
+            };
+          })(btn, i, נדרש);
+          כפתורים.appendChild(btn);
+        }
+      } else {
+        אזור.style.display = "none";
+      }
+    });
+
     document.getElementById("מיקום").addEventListener("change", function() {
       var שדה = document.getElementById("שדה-חדר");
       שדה.style.display = this.value === "חדר" ? "block" : "none";
@@ -221,10 +271,17 @@
       var dateIn = document.getElementById("כניסה").value;
       var dateOut = document.getElementById("יציאה").value;
       var notes = document.getElementById("הערות").value;
+      var נדרש = Math.ceil(parseInt(soldiers) / 8);
+
       if (course === "" || soldiers === "" || dateIn === "" || dateOut === "") {
         alert("נא למלא את כל השדות!");
         return;
       }
+      if (חדריםנבחרים.length !== נדרש) {
+        alert("נא לבחור " + נדרש + " חדרים!");
+        return;
+      }
+
       fetch(scriptURL, {
         method: "POST",
         mode: "no-cors",
@@ -236,12 +293,13 @@
           חיילים: soldiers,
           כניסה: dateIn,
           יציאה: dateOut,
-          חדרים: "",
+          חדרים: חדריםנבחרים.join(", "),
           הערות: notes
         })
       })
       .then(function() {
         alert("הבקשה הוגשה בהצלחה! ✅");
+        חדריםנבחרים = [];
         הצג("מסך-תפריט-מפקד");
       })
       .catch(function() { alert("שגיאה בחיבור לגוגל"); });
@@ -278,4 +336,3 @@
   </script>
 </body>
 </html>
-
