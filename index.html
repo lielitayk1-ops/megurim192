@@ -13,7 +13,7 @@
       padding: 40px;
     }
     h1 { font-size: 36px; }
-    input {
+    input, select, textarea {
       display: block;
       margin: 8px auto;
       padding: 10px;
@@ -22,6 +22,7 @@
       border-radius: 8px;
       border: none;
       font-size: 14px;
+      font-family: Arial;
     }
     button {
       margin-top: 16px;
@@ -34,19 +35,31 @@
       font-weight: bold;
       cursor: pointer;
     }
-    label {
-      display: block;
-      margin-top: 10px;
-    }
+    label { display: block; margin-top: 10px; }
     .בחירה-כפתורים {
       display: flex;
       justify-content: center;
       gap: 16px;
       margin-top: 20px;
+      flex-wrap: wrap;
     }
-    .בחירה-כפתורים button {
-      padding: 16px 24px;
-      font-size: 14px;
+    .כפתור-חזור {
+      background: none;
+      color: white;
+      font-size: 13px;
+      padding: 8px;
+      margin-top: 8px;
+    }
+    .תפריט-רובריקות {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      margin-top: 20px;
+      flex-wrap: wrap;
+    }
+    .תפריט-רובריקות button {
+      padding: 12px 20px;
+      font-size: 13px;
     }
   </style>
 </head>
@@ -72,7 +85,7 @@
     <input type="tel" id="טלפון" placeholder="050-0000000">
     <button onclick="login()">כניסה</button>
     <br>
-    <button onclick="חזור()" style="background:none;color:white;font-size:13px;padding:8px;">← חזור</button>
+    <button class="כפתור-חזור" onclick="חזור('בחירה')">← חזור</button>
   </div>
 
   <!-- מסך כניסה אחראי -->
@@ -82,12 +95,23 @@
     <input type="password" id="סיסמה" placeholder="הכנס סיסמה">
     <button onclick="loginAdmin()">כניסה</button>
     <br>
-    <button onclick="חזור()" style="background:none;color:white;font-size:13px;padding:8px;">← חזור</button>
+    <button class="כפתור-חזור" onclick="חזור('בחירה')">← חזור</button>
   </div>
 
-  <!-- מסך בקשה מפקד -->
+  <!-- תפריט מפקד -->
+  <div id="מסך-תפריט-מפקד" style="display:none">
+    <h2 id="כותרת-תפריט"></h2>
+    <div class="תפריט-רובריקות">
+      <button onclick="הצג('מסך-בקשה')">🛏️ בקשת חדרים</button>
+      <button onclick="הצג('מסך-תקלה')">🔧 פתיחת תקלה</button>
+    </div>
+    <br>
+    <button class="כפתור-חזור" onclick="חזור('בחירה')">← יציאה</button>
+  </div>
+
+  <!-- מסך בקשת חדרים -->
   <div id="מסך-בקשה" style="display:none">
-    <h2 id="כותרת-בקשה"></h2>
+    <h2>בקשת חדרים</h2>
     <label>מספר קורס:</label>
     <input type="text" id="קורס" placeholder="לדוגמה: 2024/3">
     <label>מספר חיילים:</label>
@@ -99,12 +123,47 @@
     <label>הערות:</label>
     <input type="text" id="הערות" placeholder="הערות נוספות...">
     <button onclick="submitRequest()">📤 הגש בקשה</button>
+    <br>
+    <button class="כפתור-חזור" onclick="הצג('מסך-תפריט-מפקד')">← חזור</button>
+  </div>
+
+  <!-- מסך פתיחת תקלה -->
+  <div id="מסך-תקלה" style="display:none">
+    <h2>🔧 פתיחת תקלה</h2>
+    <label>מיקום התקלה:</label>
+    <select id="מיקום">
+      <option value="">-- בחר מיקום --</option>
+      <option value="שירותים">🚻 שירותים</option>
+      <option value="מקלחות">🚿 מקלחות</option>
+      <option value="תגלחות">🪒 תגלחות</option>
+      <option value="מסדרון">🚪 מסדרון</option>
+      <option value="חדר">🛏️ חדר</option>
+    </select>
+    <div id="שדה-חדר" style="display:none">
+      <label>מספר חדר:</label>
+      <input type="number" id="מספר-חדר" placeholder="לדוגמה: 45" min="41" max="60">
+    </div>
+    <label>סוג תקלה:</label>
+    <select id="סוג-תקלה">
+      <option value="">-- בחר סוג --</option>
+      <option value="נזילה">💧 נזילה</option>
+      <option value="תקלת חשמל">⚡ תקלת חשמל</option>
+      <option value="תקלת אינסטלציה">🔩 תקלת אינסטלציה</option>
+      <option value="נזק לרכוש">🪟 נזק לרכוש</option>
+      <option value="אחר">📝 אחר</option>
+    </select>
+    <label>תיאור התקלה:</label>
+    <textarea id="תיאור" placeholder="תאר את התקלה..." rows="3"></textarea>
+    <button onclick="submitTakala()">📤 שלח תקלה</button>
+    <br>
+    <button class="כפתור-חזור" onclick="הצג('מסך-תפריט-מפקד')">← חזור</button>
   </div>
 
   <!-- מסך אחראי מגורים -->
   <div id="מסך-ניהול" style="display:none">
     <h2>ברוך הבא, אחראי מגורים 👋</h2>
-    <p>כאן תוכל לנהל את הבקשות</p>
+    <p>כאן תוכל לנהל את הבקשות והתקלות</p>
+    <button class="כפתור-חזור" onclick="חזור('בחירה')">← יציאה</button>
   </div>
 
   <script>
@@ -112,19 +171,21 @@
     var userName = "";
     var userPhone = "";
 
-    function בחר(סוג) {
-      document.getElementById("מסך-בחירה").style.display = "none";
-      if (סוג === "מפקד") {
-        document.getElementById("מסך-כניסה").style.display = "block";
-      } else {
-        document.getElementById("מסך-אחראי").style.display = "block";
-      }
+    function הצג(מסך) {
+      var מסכים = ["מסך-בחירה","מסך-כניסה","מסך-אחראי","מסך-תפריט-מפקד","מסך-בקשה","מסך-תקלה","מסך-ניהול"];
+      מסכים.forEach(function(m) {
+        document.getElementById(m).style.display = "none";
+      });
+      document.getElementById(מסך).style.display = "block";
     }
 
-    function חזור() {
-      document.getElementById("מסך-כניסה").style.display = "none";
-      document.getElementById("מסך-אחראי").style.display = "none";
-      document.getElementById("מסך-בחירה").style.display = "block";
+    function בחר(סוג) {
+      if (סוג === "מפקד") הצג("מסך-כניסה");
+      else הצג("מסך-אחראי");
+    }
+
+    function חזור(יעד) {
+      if (יעד === "בחירה") הצג("מסך-בחירה");
     }
 
     function login() {
@@ -136,9 +197,8 @@
       }
       userName = name;
       userPhone = phone;
-      document.getElementById("מסך-כניסה").style.display = "none";
-      document.getElementById("מסך-בקשה").style.display = "block";
-      document.getElementById("כותרת-בקשה").textContent = "שלום " + name + ", מלא פרטי הבקשה:";
+      document.getElementById("כותרת-תפריט").textContent = "שלום " + name + " 👋";
+      הצג("מסך-תפריט-מפקד");
     }
 
     function loginAdmin() {
@@ -147,9 +207,13 @@
         alert("סיסמה שגויה!");
         return;
       }
-      document.getElementById("מסך-אחראי").style.display = "none";
-      document.getElementById("מסך-ניהול").style.display = "block";
+      הצג("מסך-ניהול");
     }
+
+    document.getElementById("מיקום").addEventListener("change", function() {
+      var שדה = document.getElementById("שדה-חדר");
+      שדה.style.display = this.value === "חדר" ? "block" : "none";
+    });
 
     function submitRequest() {
       var course = document.getElementById("קורס").value;
@@ -161,30 +225,56 @@
         alert("נא למלא את כל השדות!");
         return;
       }
-      var data = {
-        שם: userName,
-        טלפון: userPhone,
-        קורס: course,
-        חיילים: soldiers,
-        כניסה: dateIn,
-        יציאה: dateOut,
-        חדרים: "",
-        הערות: notes
-      };
       fetch(scriptURL, {
         method: "POST",
         mode: "no-cors",
-        body: JSON.stringify(data)
+        body: JSON.stringify({
+          סוג: "בקשה",
+          שם: userName,
+          טלפון: userPhone,
+          קורס: course,
+          חיילים: soldiers,
+          כניסה: dateIn,
+          יציאה: dateOut,
+          חדרים: "",
+          הערות: notes
+        })
       })
       .then(function() {
-        alert("הבקשה הוגשה בהצלחה!");
-        document.getElementById("מסך-בקשה").style.display = "none";
+        alert("הבקשה הוגשה בהצלחה! ✅");
+        הצג("מסך-תפריט-מפקד");
       })
-      .catch(function() {
-        alert("שגיאה בחיבור לגוגל");
-      });
+      .catch(function() { alert("שגיאה בחיבור לגוגל"); });
+    }
+
+    function submitTakala() {
+      var מיקום = document.getElementById("מיקום").value;
+      var סוגתקלה = document.getElementById("סוג-תקלה").value;
+      var תיאור = document.getElementById("תיאור").value;
+      var מספרחדר = document.getElementById("מספר-חדר").value;
+      if (מיקום === "" || סוגתקלה === "" || תיאור === "") {
+        alert("נא למלא את כל השדות!");
+        return;
+      }
+      var מיקוםסופי = מיקום === "חדר" ? "חדר " + מספרחדר : מיקום;
+      fetch(scriptURL, {
+        method: "POST",
+        mode: "no-cors",
+        body: JSON.stringify({
+          סוג: "תקלה",
+          שם: userName,
+          טלפון: userPhone,
+          מיקום: מיקוםסופי,
+          סוגתקלה: סוגתקלה,
+          תיאור: תיאור
+        })
+      })
+      .then(function() {
+        alert("התקלה נפתחה בהצלחה! 🔧");
+        הצג("מסך-תפריט-מפקד");
+      })
+      .catch(function() { alert("שגיאה בחיבור לגוגל"); });
     }
   </script>
 </body>
 </html>
-
