@@ -3,156 +3,197 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ניהול מגורים</title>
+  <title>ניהול מגורים – הילטון 192</title>
   <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
       background: linear-gradient(135deg, #8b0000, #00008b);
       color: white;
-      font-family: Arial;
+      font-family: Arial, sans-serif;
       text-align: center;
-      padding: 40px;
+      min-height: 100vh;
+      padding: 30px 16px;
     }
-    h1 { font-size: 36px; }
+    h1 { font-size: 32px; margin-bottom: 4px; }
+    h2 { font-size: 22px; margin: 16px 0 8px; }
+    .subtitle { font-size: 14px; color: #ccc; margin-bottom: 16px; }
+    .screen { display: none; }
+    .screen.active { display: block; }
     input, select, textarea {
       display: block;
       margin: 8px auto;
-      padding: 10px;
-      width: 90%;
-      max-width: 320px;
-      border-radius: 8px;
+      padding: 12px;
+      width: 100%;
+      max-width: 340px;
+      border-radius: 10px;
       border: none;
-      font-size: 14px;
+      font-size: 15px;
       font-family: Arial;
+      color: #111;
     }
-    button {
-      margin-top: 16px;
-      padding: 12px 40px;
-      background-color: #58a6ff;
-      color: black;
+    textarea { resize: vertical; }
+    .btn {
+      display: block;
+      margin: 14px auto 0;
+      padding: 13px 36px;
+      background: #58a6ff;
+      color: #000;
       border: none;
-      border-radius: 8px;
+      border-radius: 10px;
       font-size: 15px;
       font-weight: bold;
       cursor: pointer;
+      width: 100%;
+      max-width: 340px;
     }
-    label { display: block; margin-top: 10px; }
-    .בחירה-כפתורים {
-      display: flex;
-      justify-content: center;
-      gap: 16px;
-      margin-top: 20px;
-      flex-wrap: wrap;
-    }
-    .כפתור-חזור {
+    .btn-back {
       background: none;
-      color: white;
+      color: #aaa;
       font-size: 13px;
       padding: 8px;
-      margin-top: 8px;
+      margin-top: 10px;
+      width: auto;
+      max-width: none;
+      border: none;
+      cursor: pointer;
+      display: inline-block;
     }
-    .תפריט-רובריקות {
+    .choice-btns {
       display: flex;
       justify-content: center;
       gap: 12px;
-      margin-top: 20px;
       flex-wrap: wrap;
+      margin-top: 20px;
     }
-    .תפריט-רובריקות button {
-      padding: 12px 20px;
-      font-size: 13px;
+    .choice-btns .btn {
+      width: 145px;
+      padding: 16px 10px;
+      font-size: 14px;
+      line-height: 1.6;
     }
-    .הודעה {
+    .menu-btns {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 20px;
+    }
+    .menu-btns .btn {
+      width: 150px;
+      padding: 16px 10px;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+    label {
+      display: block;
+      margin: 12px auto 2px;
+      max-width: 340px;
+      text-align: right;
+      font-size: 14px;
+      color: #ddd;
+    }
+    #room-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 8px;
+      margin: 10px auto;
+      max-width: 340px;
+    }
+    .room-btn {
+      padding: 10px 0;
+      border-radius: 8px;
+      border: none;
+      background: #444;
+      color: white;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: bold;
+      width: 50px;
+    }
+    .room-btn.selected { background: #58a6ff; color: #000; }
+    .rooms-hint {
       font-size: 13px;
-      margin-top: 8px;
-      color: #aaffaa;
+      color: #ccc;
+      margin: 8px auto;
+      max-width: 340px;
     }
   </style>
 </head>
 <body>
+
   <h1>🏠 ניהול מגורים</h1>
-  <p>הילטון 192</p>
+  <p class="subtitle">הילטון 192</p>
 
   <!-- מסך בחירה -->
-  <div id="מסך-בחירה">
+  <div id="screen-home" class="screen active">
     <h2>מי אתה?</h2>
-    <div class="בחירה-כפתורים">
-      <button onclick="בחר('מפקד')">👨‍✈️ מפקד קורס</button>
-      <button onclick="בחר('אחראי')">🔑 אחראי מגורים</button>
+    <div class="choice-btns">
+      <button class="btn" onclick="showScreen('screen-commander')">👨‍✈️<br>מפקד קורס</button>
+      <button class="btn" onclick="showScreen('screen-admin-login')">🔑<br>אחראי מגורים</button>
     </div>
   </div>
 
-  <!-- מסך כניסה מפקד - שלב 1 -->
-  <div id="מסך-כניסה" style="display:none">
+  <!-- מסך כניסה מפקד -->
+  <div id="screen-commander" class="screen">
     <h2>מפקד קורס – כניסה</h2>
     <label>שם מלא:</label>
-    <input type="text" id="שם" placeholder="הכנס שם מלא">
+    <input type="text" id="cmd-name" placeholder="הכנס שם מלא">
     <label>אימייל:</label>
-    <input type="email" id="אימייל" placeholder="example@gmail.com">
-    <button onclick="שלחקוד()">📧 שלח קוד לאימייל</button>
-    <div class="הודעה" id="הודעת-קוד" style="display:none">✅ קוד נשלח לאימייל שלך!</div>
+    <input type="email" id="cmd-email" placeholder="example@gmail.com">
+    <button class="btn" onclick="commanderLogin()">כניסה</button>
     <br>
-    <button class="כפתור-חזור" onclick="חזור('בחירה')">← חזור</button>
-  </div>
-
-  <!-- מסך כניסה מפקד - שלב 2 -->
-  <div id="מסך-קוד" style="display:none">
-    <h2>הכנס קוד אימות</h2>
-    <p style="font-size:13px;color:#ccc;">הקוד נשלח לאימייל שלך</p>
-    <label>קוד אימות:</label>
-    <input type="text" id="קוד" placeholder="הכנס קוד 6 ספרות" maxlength="6">
-    <button onclick="אמתקוד()">✅ כניסה</button>
-    <br>
-    <button class="כפתור-חזור" onclick="הצג('מסך-כניסה')">← חזור</button>
+    <button class="btn-back" onclick="showScreen('screen-home')">← חזור</button>
   </div>
 
   <!-- מסך כניסה אחראי -->
-  <div id="מסך-אחראי" style="display:none">
+  <div id="screen-admin-login" class="screen">
     <h2>אחראי מגורים – כניסה</h2>
     <label>סיסמה:</label>
-    <input type="password" id="סיסמה" placeholder="הכנס סיסמה">
-    <button onclick="loginAdmin()">כניסה</button>
+    <input type="password" id="admin-pass" placeholder="הכנס סיסמה">
+    <button class="btn" onclick="adminLogin()">כניסה</button>
     <br>
-    <button class="כפתור-חזור" onclick="חזור('בחירה')">← חזור</button>
+    <button class="btn-back" onclick="showScreen('screen-home')">← חזור</button>
   </div>
 
   <!-- תפריט מפקד -->
-  <div id="מסך-תפריט-מפקד" style="display:none">
-    <h2 id="כותרת-תפריט"></h2>
-    <div class="תפריט-רובריקות">
-      <button onclick="הצג('מסך-בקשה')">🛏️ בקשת חדרים</button>
-      <button onclick="הצג('מסך-תקלה')">🔧 פתיחת תקלה</button>
+  <div id="screen-menu" class="screen">
+    <h2 id="menu-title"></h2>
+    <div class="menu-btns">
+      <button class="btn" onclick="showScreen('screen-request')">🛏️<br>בקשת חדרים</button>
+      <button class="btn" onclick="showScreen('screen-fault')">🔧<br>פתיחת תקלה</button>
     </div>
     <br>
-    <button class="כפתור-חזור" onclick="חזור('בחירה')">← יציאה</button>
+    <button class="btn-back" onclick="showScreen('screen-home')">← יציאה</button>
   </div>
 
   <!-- מסך בקשת חדרים -->
-  <div id="מסך-בקשה" style="display:none">
-    <h2>בקשת חדרים</h2>
+  <div id="screen-request" class="screen">
+    <h2>🛏️ בקשת חדרים</h2>
     <label>מספר קורס:</label>
-    <input type="text" id="קורס" placeholder="לדוגמה: 2024/3">
+    <input type="text" id="req-course" placeholder="לדוגמה: 2024/3">
     <label>מספר חיילים:</label>
-    <input type="number" id="חיילים" placeholder="כמה חיילים?" oninput="עדכןחדרים(this.value)">
-    <div id="אזור-חדרים" style="display:none">
-      <p id="הסבר-חדרים" style="font-size:13px;color:#ccc;margin-top:10px;"></p>
-      <div id="כפתורי-חדרים" style="display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin-top:8px;"></div>
+    <input type="number" id="req-soldiers" placeholder="כמה חיילים?" oninput="updateRooms(this.value)">
+    <div id="rooms-area" style="display:none">
+      <p class="rooms-hint" id="rooms-hint"></p>
+      <div id="room-buttons"></div>
     </div>
-    <label>תאריך כניסה לחדר:</label>
-    <input type="date" id="כניסה">
-    <label>תאריך יציאה מחדר:</label>
-    <input type="date" id="יציאה">
-    <label>הערות:</label>
-    <input type="text" id="הערות" placeholder="הערות נוספות...">
-    <button onclick="submitRequest()">📤 הגש בקשה</button>
+    <label>תאריך כניסה:</label>
+    <input type="date" id="req-date-in">
+    <label>תאריך יציאה:</label>
+    <input type="date" id="req-date-out">
+    <label>הערות (לא חובה):</label>
+    <input type="text" id="req-notes" placeholder="הערות נוספות...">
+    <button class="btn" onclick="submitRequest()">📤 הגש בקשה</button>
     <br>
-    <button class="כפתור-חזור" onclick="הצג('מסך-תפריט-מפקד')">← חזור</button>
+    <button class="btn-back" onclick="showScreen('screen-menu')">← חזור</button>
   </div>
 
-  <!-- מסך פתיחת תקלה -->
-  <div id="מסך-תקלה" style="display:none">
+  <!-- מסך תקלה -->
+  <div id="screen-fault" class="screen">
     <h2>🔧 פתיחת תקלה</h2>
-    <label>מיקום התקלה:</label>
-    <select id="מיקום" onchange="עדכןמיקום(this.value)">
+    <label>מיקום:</label>
+    <select id="fault-location" onchange="updateLocation(this.value)">
       <option value="">-- בחר מיקום --</option>
       <option value="שירותים">🚻 שירותים</option>
       <option value="מקלחות">🚿 מקלחות</option>
@@ -160,12 +201,12 @@
       <option value="מסדרון">🚪 מסדרון</option>
       <option value="חדר">🛏️ חדר</option>
     </select>
-    <div id="שדה-חדר" style="display:none">
+    <div id="fault-room-field" style="display:none">
       <label>מספר חדר:</label>
-      <input type="number" id="מספר-חדר" placeholder="לדוגמה: 45" min="41" max="60">
+      <input type="number" id="fault-room-num" placeholder="41-60" min="41" max="60">
     </div>
     <label>סוג תקלה:</label>
-    <select id="סוג-תקלה">
+    <select id="fault-type">
       <option value="">-- בחר סוג --</option>
       <option value="נזילה">💧 נזילה</option>
       <option value="תקלת חשמל">⚡ תקלת חשמל</option>
@@ -173,193 +214,164 @@
       <option value="נזק לרכוש">🪟 נזק לרכוש</option>
       <option value="אחר">📝 אחר</option>
     </select>
-    <label>תיאור התקלה:</label>
-    <textarea id="תיאור" placeholder="תאר את התקלה..." rows="3"></textarea>
-    <button onclick="submitTakala()">📤 שלח תקלה</button>
+    <label>תיאור:</label>
+    <textarea id="fault-desc" placeholder="תאר את התקלה..." rows="3"></textarea>
+    <button class="btn" onclick="submitFault()">📤 שלח תקלה</button>
     <br>
-    <button class="כפתור-חזור" onclick="הצג('מסך-תפריט-מפקד')">← חזור</button>
+    <button class="btn-back" onclick="showScreen('screen-menu')">← חזור</button>
   </div>
 
-  <!-- מסך אחראי מגורים -->
-  <div id="מסך-ניהול" style="display:none">
+  <!-- מסך אחראי -->
+  <div id="screen-admin" class="screen">
     <h2>ברוך הבא, אחראי מגורים 👋</h2>
-    <p>כאן תוכל לנהל את הבקשות והתקלות</p>
-    <button class="כפתור-חזור" onclick="חזור('בחירה')">← יציאה</button>
+    <p style="color:#ccc;font-size:14px;margin-top:8px;">כאן תוכל לנהל בקשות ותקלות</p>
+    <br>
+    <button class="btn-back" onclick="showScreen('screen-home')">← יציאה</button>
   </div>
 
   <script>
-    var scriptURL = "https://script.google.com/macros/s/AKfycbzLVK8WWQxUFkNG__M-xlXlCxzdUMOjNHG0tJoZjewxHWAl8Slvrn4GgDK5_6MytF27/exec";
+    var SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzLVK8WWQxUFkNG__M-xlXlCxzdUMOjNHG0tJoZjewxHWAl8Slvrn4GgDK5_6MytF27/exec";
     var userName = "";
     var userEmail = "";
-    var חדריםנבחרים = [];
+    var selectedRooms = [];
 
-    function הצג(מסך) {
-      var מסכים = ["מסך-בחירה","מסך-כניסה","מסך-קוד","מסך-אחראי","מסך-תפריט-מפקד","מסך-בקשה","מסך-תקלה","מסך-ניהול"];
-      מסכים.forEach(function(m) {
-        document.getElementById(m).style.display = "none";
+    function showScreen(id) {
+      document.querySelectorAll('.screen').forEach(function(el) {
+        el.classList.remove('active');
       });
-      document.getElementById(מסך).style.display = "block";
+      document.getElementById(id).classList.add('active');
     }
 
-    function בחר(סוג) {
-      if (סוג === "מפקד") הצג("מסך-כניסה");
-      else הצג("מסך-אחראי");
-    }
-
-    function חזור(יעד) {
-      if (יעד === "בחירה") הצג("מסך-בחירה");
-    }
-
-    function שלחקוד() {
-      var name = document.getElementById("שם").value;
-      var email = document.getElementById("אימייל").value;
-      if (name === "" || email === "") {
-        alert("נא למלא שם ואימייל!");
+    function commanderLogin() {
+      var name = document.getElementById('cmd-name').value.trim();
+      var email = document.getElementById('cmd-email').value.trim();
+      if (!name || !email) {
+        alert('נא למלא שם ואימייל!');
         return;
       }
       userName = name;
       userEmail = email;
-      fetch(scriptURL, {
-        method: "POST",
-        mode: "no-cors",
-        body: JSON.stringify({ סוג: "קוד", שם: name, אימייל: email })
-      })
-      .then(function() {
-        document.getElementById("הודעת-קוד").style.display = "block";
-        setTimeout(function() { הצג("מסך-קוד"); }, 1500);
-      })
-      .catch(function() { alert("שגיאה בשליחת קוד"); });
+      document.getElementById('menu-title').textContent = 'שלום ' + name + ' 👋';
+      showScreen('screen-menu');
     }
 
-    function אמתקוד() {
-      var קוד = document.getElementById("קוד").value;
-      if (קוד.length !== 6) {
-        alert("נא להכניס קוד בן 6 ספרות!");
+    function adminLogin() {
+      var pass = document.getElementById('admin-pass').value;
+      if (pass !== 'Hilton192!') {
+        alert('סיסמה שגויה!');
         return;
       }
-      fetch(scriptURL + "?סוג=אימות&אימייל=" + encodeURIComponent(userEmail) + "&קוד=" + קוד)
-      .then(function(r) { return r.text(); })
-      .then(function(t) {
-        if (t === "VALID") {
-          document.getElementById("כותרת-תפריט").textContent = "שלום " + userName + " 👋";
-          הצג("מסך-תפריט-מפקד");
-        } else {
-          alert("קוד שגוי! נסה שוב.");
-        }
-      })
-      .catch(function() {
-        document.getElementById("כותרת-תפריט").textContent = "שלום " + userName + " 👋";
-        הצג("מסך-תפריט-מפקד");
-      });
+      showScreen('screen-admin');
     }
 
-    function loginAdmin() {
-      var pass = document.getElementById("סיסמה").value;
-      if (pass !== "Hilton192!") {
-        alert("סיסמה שגויה!");
-        return;
-      }
-      הצג("מסך-ניהול");
-    }
-
-    function עדכןחדרים(val) {
-      var חיילים = parseInt(val) || 0;
-      var נדרש = Math.ceil(חיילים / 8);
-      var אזור = document.getElementById("אזור-חדרים");
-      var הסבר = document.getElementById("הסבר-חדרים");
-      var כפתורים = document.getElementById("כפתורי-חדרים");
-      if (חיילים > 0) {
-        אזור.style.display = "block";
-        הסבר.textContent = חיילים + " חיילים = " + נדרש + " חדרים. בחר " + נדרש + " חדרים:";
-        חדריםנבחרים = [];
-        כפתורים.innerHTML = "";
-        var חדריםלא = [51, 54];
+    function updateRooms(val) {
+      var soldiers = parseInt(val) || 0;
+      var needed = Math.ceil(soldiers / 8);
+      var area = document.getElementById('rooms-area');
+      var hint = document.getElementById('rooms-hint');
+      var btns = document.getElementById('room-buttons');
+      selectedRooms = [];
+      if (soldiers > 0) {
+        area.style.display = 'block';
+        hint.textContent = soldiers + ' חיילים = ' + needed + ' חדרים. בחר ' + needed + ' חדרים:';
+        btns.innerHTML = '';
+        var blocked = [51, 54];
         for (var i = 41; i <= 60; i++) {
-          if (חדריםלא.includes(i)) continue;
-          var btn = document.createElement("button");
+          if (blocked.includes(i)) continue;
+          var btn = document.createElement('button');
+          btn.className = 'room-btn';
           btn.textContent = i;
-          btn.style.cssText = "padding:10px 14px;border-radius:8px;border:none;background:#333;color:white;cursor:pointer;font-size:14px;font-weight:bold;margin:0;";
           btn.onclick = (function(b, num, n) {
             return function() {
-              if (b.style.background === "rgb(88, 166, 255)") {
-                b.style.background = "#333";
-                חדריםנבחרים = חדריםנבחרים.filter(function(x) { return x !== num; });
+              if (b.classList.contains('selected')) {
+                b.classList.remove('selected');
+                selectedRooms = selectedRooms.filter(function(x) { return x !== num; });
               } else {
-                if (חדריםנבחרים.length >= n) {
-                  alert("אפשר לבחור רק " + n + " חדרים!");
+                if (selectedRooms.length >= n) {
+                  alert('אפשר לבחור רק ' + n + ' חדרים!');
                   return;
                 }
-                b.style.background = "#58a6ff";
-                חדריםנבחרים.push(num);
+                b.classList.add('selected');
+                selectedRooms.push(num);
               }
             };
-          })(btn, i, נדרש);
-          כפתורים.appendChild(btn);
+          })(btn, i, needed);
+          btns.appendChild(btn);
         }
       } else {
-        אזור.style.display = "none";
+        area.style.display = 'none';
       }
     }
 
-    function עדכןמיקום(val) {
-      document.getElementById("שדה-חדר").style.display = val === "חדר" ? "block" : "none";
+    function updateLocation(val) {
+      document.getElementById('fault-room-field').style.display = val === 'חדר' ? 'block' : 'none';
     }
 
     function submitRequest() {
-      var course = document.getElementById("קורס").value;
-      var soldiers = document.getElementById("חיילים").value;
-      var dateIn = document.getElementById("כניסה").value;
-      var dateOut = document.getElementById("יציאה").value;
-      var notes = document.getElementById("הערות").value;
-      var נדרש = Math.ceil(parseInt(soldiers) / 8);
-      if (course === "" || soldiers === "" || dateIn === "" || dateOut === "") {
-        alert("נא למלא את כל השדות!");
+      var course = document.getElementById('req-course').value.trim();
+      var soldiers = document.getElementById('req-soldiers').value;
+      var dateIn = document.getElementById('req-date-in').value;
+      var dateOut = document.getElementById('req-date-out').value;
+      var notes = document.getElementById('req-notes').value;
+      var needed = Math.ceil(parseInt(soldiers) / 8);
+      if (!course || !soldiers || !dateIn || !dateOut) {
+        alert('נא למלא את כל השדות!');
         return;
       }
-      if (חדריםנבחרים.length !== נדרש) {
-        alert("נא לבחור " + נדרש + " חדרים!");
+      if (selectedRooms.length !== needed) {
+        alert('נא לבחור ' + needed + ' חדרים!');
         return;
       }
-      fetch(scriptURL, {
-        method: "POST",
-        mode: "no-cors",
+      fetch(SCRIPT_URL, {
+        method: 'POST',
+        mode: 'no-cors',
         body: JSON.stringify({
-          סוג: "בקשה", שם: userName, אימייל: userEmail,
-          קורס: course, חיילים: soldiers, כניסה: dateIn,
-          יציאה: dateOut, חדרים: חדריםנבחרים.join(", "), הערות: notes
+          סוג: 'בקשה',
+          שם: userName,
+          אימייל: userEmail,
+          קורס: course,
+          חיילים: soldiers,
+          כניסה: dateIn,
+          יציאה: dateOut,
+          חדרים: selectedRooms.join(', '),
+          הערות: notes
         })
-      })
-      .then(function() {
-        alert("הבקשה הוגשה! ✅ פרטים נשלחו לאימייל שלך.");
-        חדריםנבחרים = [];
-        הצג("מסך-תפריט-מפקד");
-      })
-      .catch(function() { alert("שגיאה בחיבור"); });
+      }).then(function() {
+        alert('הבקשה הוגשה בהצלחה! ✅');
+        selectedRooms = [];
+        showScreen('screen-menu');
+      }).catch(function() {
+        alert('שגיאה בחיבור לשרת');
+      });
     }
 
-    function submitTakala() {
-      var מיקום = document.getElementById("מיקום").value;
-      var סוגתקלה = document.getElementById("סוג-תקלה").value;
-      var תיאור = document.getElementById("תיאור").value;
-      var מספרחדר = document.getElementById("מספר-חדר").value;
-      if (מיקום === "" || סוגתקלה === "" || תיאור === "") {
-        alert("נא למלא את כל השדות!");
+    function submitFault() {
+      var location = document.getElementById('fault-location').value;
+      var type = document.getElementById('fault-type').value;
+      var desc = document.getElementById('fault-desc').value.trim();
+      var roomNum = document.getElementById('fault-room-num').value;
+      if (!location || !type || !desc) {
+        alert('נא למלא את כל השדות!');
         return;
       }
-      var מיקוםסופי = מיקום === "חדר" ? "חדר " + מספרחדר : מיקום;
-      fetch(scriptURL, {
-        method: "POST",
-        mode: "no-cors",
+      var finalLocation = location === 'חדר' ? 'חדר ' + roomNum : location;
+      fetch(SCRIPT_URL, {
+        method: 'POST',
+        mode: 'no-cors',
         body: JSON.stringify({
-          סוג: "תקלה", שם: userName, אימייל: userEmail,
-          מיקום: מיקוםסופי, סוגתקלה: סוגתקלה, תיאור: תיאור
+          סוג: 'תקלה',
+          שם: userName,
+          אימייל: userEmail,
+          מיקום: finalLocation,
+          סוגתקלה: type,
+          תיאור: desc
         })
-      })
-      .then(function() {
-        alert("התקלה נפתחה! 🔧 פרטים נשלחו לאימייל שלך.");
-        הצג("מסך-תפריט-מפקד");
-      })
-      .catch(function() { alert("שגיאה בחיבור"); });
+      }).then(function() {
+        alert('התקלה נפתחה בהצלחה! 🔧');
+        showScreen('screen-menu');
+      }).catch(function() {
+        alert('שגיאה בחיבור לשרת');
+      });
     }
   </script>
 </body>
