@@ -115,7 +115,7 @@
     <label>מספר קורס:</label>
     <input type="text" id="קורס" placeholder="לדוגמה: 2024/3">
     <label>מספר חיילים:</label>
-    <input type="number" id="חיילים" placeholder="כמה חיילים?">
+    <input type="number" id="חיילים" placeholder="כמה חיילים?" oninput="עדכןחדרים(this.value)">
 
     <!-- אזור בחירת חדרים -->
     <div id="אזור-חדרים" style="display:none">
@@ -138,7 +138,7 @@
   <div id="מסך-תקלה" style="display:none">
     <h2>🔧 פתיחת תקלה</h2>
     <label>מיקום התקלה:</label>
-    <select id="מיקום">
+    <select id="מיקום" onchange="עדכןמיקום(this.value)">
       <option value="">-- בחר מיקום --</option>
       <option value="שירותים">🚻 שירותים</option>
       <option value="מקלחות">🚿 מקלחות</option>
@@ -218,9 +218,8 @@
       הצג("מסך-ניהול");
     }
 
-    // בחירת חדרים לפי מספר חיילים
-    document.getElementById("חיילים").addEventListener("input", function() {
-      var חיילים = parseInt(this.value) || 0;
+    function עדכןחדרים(val) {
+      var חיילים = parseInt(val) || 0;
       var נדרש = Math.ceil(חיילים / 8);
       var אזור = document.getElementById("אזור-חדרים");
       var הסבר = document.getElementById("הסבר-חדרים");
@@ -258,12 +257,11 @@
       } else {
         אזור.style.display = "none";
       }
-    });
+    }
 
-    document.getElementById("מיקום").addEventListener("change", function() {
-      var שדה = document.getElementById("שדה-חדר");
-      שדה.style.display = this.value === "חדר" ? "block" : "none";
-    });
+    function עדכןמיקום(val) {
+      document.getElementById("שדה-חדר").style.display = val === "חדר" ? "block" : "none";
+    }
 
     function submitRequest() {
       var course = document.getElementById("קורס").value;
