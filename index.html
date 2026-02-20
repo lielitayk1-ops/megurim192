@@ -61,6 +61,11 @@
       padding: 12px 20px;
       font-size: 13px;
     }
+    .הודעה {
+      font-size: 13px;
+      margin-top: 8px;
+      color: #aaffaa;
+    }
   </style>
 </head>
 <body>
@@ -76,16 +81,28 @@
     </div>
   </div>
 
-  <!-- מסך כניסה מפקד -->
+  <!-- מסך כניסה מפקד - שלב 1 -->
   <div id="מסך-כניסה" style="display:none">
     <h2>מפקד קורס – כניסה</h2>
     <label>שם מלא:</label>
     <input type="text" id="שם" placeholder="הכנס שם מלא">
-    <label>מספר טלפון:</label>
-    <input type="tel" id="טלפון" placeholder="050-0000000">
-    <button onclick="login()">כניסה</button>
+    <label>אימייל:</label>
+    <input type="email" id="אימייל" placeholder="example@gmail.com">
+    <button onclick="שלחקוד()">📧 שלח קוד לאימייל</button>
+    <div class="הודעה" id="הודעת-קוד" style="display:none">✅ קוד נשלח לאימייל שלך!</div>
     <br>
     <button class="כפתור-חזור" onclick="חזור('בחירה')">← חזור</button>
+  </div>
+
+  <!-- מסך כניסה מפקד - שלב 2 -->
+  <div id="מסך-קוד" style="display:none">
+    <h2>הכנס קוד אימות</h2>
+    <p style="font-size:13px;color:#ccc;">הקוד נשלח לאימייל שלך</p>
+    <label>קוד אימות:</label>
+    <input type="text" id="קוד" placeholder="הכנס קוד 6 ספרות" maxlength="6">
+    <button onclick="אמתקוד()">✅ כניסה</button>
+    <br>
+    <button class="כפתור-חזור" onclick="הצג('מסך-כניסה')">← חזור</button>
   </div>
 
   <!-- מסך כניסה אחראי -->
@@ -116,13 +133,10 @@
     <input type="text" id="קורס" placeholder="לדוגמה: 2024/3">
     <label>מספר חיילים:</label>
     <input type="number" id="חיילים" placeholder="כמה חיילים?" oninput="עדכןחדרים(this.value)">
-
-    <!-- אזור בחירת חדרים -->
     <div id="אזור-חדרים" style="display:none">
       <p id="הסבר-חדרים" style="font-size:13px;color:#ccc;margin-top:10px;"></p>
       <div id="כפתורי-חדרים" style="display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin-top:8px;"></div>
     </div>
-
     <label>תאריך כניסה לחדר:</label>
     <input type="date" id="כניסה">
     <label>תאריך יציאה מחדר:</label>
@@ -176,11 +190,11 @@
   <script>
     var scriptURL = "https://script.google.com/macros/s/AKfycbzLVK8WWQxUFkNG__M-xlXlCxzdUMOjNHG0tJoZjewxHWAl8Slvrn4GgDK5_6MytF27/exec";
     var userName = "";
-    var userPhone = "";
+    var userEmail = "";
     var חדריםנבחרים = [];
 
     function הצג(מסך) {
-      var מסכים = ["מסך-בחירה","מסך-כניסה","מסך-אחראי","מסך-תפריט-מפקד","מסך-בקשה","מסך-תקלה","מסך-ניהול"];
+      var מסכים = ["מסך-בחירה","מסך-כניסה","מסך-קוד","מסך-אחראי","מסך-תפריט-מפקד","מסך-בקשה","מסך-תקלה","מסך-ניהול"];
       מסכים.forEach(function(m) {
         document.getElementById(m).style.display = "none";
       });
@@ -196,17 +210,47 @@
       if (יעד === "בחירה") הצג("מסך-בחירה");
     }
 
-    function login() {
+    function שלחקוד() {
       var name = document.getElementById("שם").value;
-      var phone = document.getElementById("טלפון").value;
-      if (name === "" || phone === "") {
-        alert("נא למלא שם וטלפון!");
+      var email = document.getElementById("אימייל").value;
+      if (name === "" || email === "") {
+        alert("נא למלא שם ואימייל!");
         return;
       }
       userName = name;
-      userPhone = phone;
-      document.getElementById("כותרת-תפריט").textContent = "שלום " + name + " 👋";
-      הצג("מסך-תפריט-מפקד");
+      userEmail = email;
+      fetch(scriptURL, {
+        method: "POST",
+        mode: "no-cors",
+        body: JSON.stringify({ סוג: "קוד", שם: name, אימייל: email })
+      })
+      .then(function() {
+        document.getElementById("הודעת-קוד").style.display = "block";
+        setTimeout(function() { הצג("מסך-קוד"); }, 1500);
+      })
+      .catch(function() { alert("שגיאה בשליחת קוד"); });
+    }
+
+    function אמתקוד() {
+      var קוד = document.getElementById("קוד").value;
+      if (קוד.length !== 6) {
+        alert("נא להכניס קוד בן 6 ספרות!");
+        return;
+      }
+      fetch(scriptURL + "?סוג=אימות&אימייל=" + encodeURIComponent(userEmail) + "&קוד=" + קוד)
+      .then(function(r) { return r.text(); })
+      .then(function(t) {
+        if (t === "VALID") {
+          document.getElementById("כותרת-תפריט").textContent = "שלום " + userName + " 👋";
+          הצג("מסך-תפריט-מפקד");
+        } else {
+          alert("קוד שגוי! נסה שוב.");
+        }
+      })
+      .catch(function() {
+        document.getElementById("כותרת-תפריט").textContent = "שלום " + userName + " 👋";
+        הצג("מסך-תפריט-מפקד");
+      });
     }
 
     function loginAdmin() {
@@ -224,13 +268,11 @@
       var אזור = document.getElementById("אזור-חדרים");
       var הסבר = document.getElementById("הסבר-חדרים");
       var כפתורים = document.getElementById("כפתורי-חדרים");
-
       if (חיילים > 0) {
         אזור.style.display = "block";
         הסבר.textContent = חיילים + " חיילים = " + נדרש + " חדרים. בחר " + נדרש + " חדרים:";
         חדריםנבחרים = [];
         כפתורים.innerHTML = "";
-
         var חדריםלא = [51, 54];
         for (var i = 41; i <= 60; i++) {
           if (חדריםלא.includes(i)) continue;
@@ -270,7 +312,6 @@
       var dateOut = document.getElementById("יציאה").value;
       var notes = document.getElementById("הערות").value;
       var נדרש = Math.ceil(parseInt(soldiers) / 8);
-
       if (course === "" || soldiers === "" || dateIn === "" || dateOut === "") {
         alert("נא למלא את כל השדות!");
         return;
@@ -279,28 +320,21 @@
         alert("נא לבחור " + נדרש + " חדרים!");
         return;
       }
-
       fetch(scriptURL, {
         method: "POST",
         mode: "no-cors",
         body: JSON.stringify({
-          סוג: "בקשה",
-          שם: userName,
-          טלפון: userPhone,
-          קורס: course,
-          חיילים: soldiers,
-          כניסה: dateIn,
-          יציאה: dateOut,
-          חדרים: חדריםנבחרים.join(", "),
-          הערות: notes
+          סוג: "בקשה", שם: userName, אימייל: userEmail,
+          קורס: course, חיילים: soldiers, כניסה: dateIn,
+          יציאה: dateOut, חדרים: חדריםנבחרים.join(", "), הערות: notes
         })
       })
       .then(function() {
-        alert("הבקשה הוגשה בהצלחה! ✅");
+        alert("הבקשה הוגשה! ✅ פרטים נשלחו לאימייל שלך.");
         חדריםנבחרים = [];
         הצג("מסך-תפריט-מפקד");
       })
-      .catch(function() { alert("שגיאה בחיבור לגוגל"); });
+      .catch(function() { alert("שגיאה בחיבור"); });
     }
 
     function submitTakala() {
@@ -317,19 +351,15 @@
         method: "POST",
         mode: "no-cors",
         body: JSON.stringify({
-          סוג: "תקלה",
-          שם: userName,
-          טלפון: userPhone,
-          מיקום: מיקוםסופי,
-          סוגתקלה: סוגתקלה,
-          תיאור: תיאור
+          סוג: "תקלה", שם: userName, אימייל: userEmail,
+          מיקום: מיקוםסופי, סוגתקלה: סוגתקלה, תיאור: תיאור
         })
       })
       .then(function() {
-        alert("התקלה נפתחה בהצלחה! 🔧");
+        alert("התקלה נפתחה! 🔧 פרטים נשלחו לאימייל שלך.");
         הצג("מסך-תפריט-מפקד");
       })
-      .catch(function() { alert("שגיאה בחיבור לגוגל"); });
+      .catch(function() { alert("שגיאה בחיבור"); });
     }
   </script>
 </body>
